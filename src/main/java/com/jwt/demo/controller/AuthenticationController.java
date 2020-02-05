@@ -1,5 +1,7 @@
 package com.jwt.demo.controller;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,7 +33,7 @@ public class AuthenticationController {
 	@Autowired
 	private UserService userService;
 
-	@RequestMapping(value = "/generate-token", method = RequestMethod.POST)
+	/*@RequestMapping(value = "/generate-token", method = RequestMethod.POST)
 	public ApiResponse<AuthToken> register(@RequestBody LoginUser loginUser) throws AuthenticationException {
 
 		System.out.println("Hi there i changed prop am here!! resjkstarting i am changing stuffs heres");
@@ -40,6 +42,15 @@ public class AuthenticationController {
 		final User user = userService.findOne(loginUser.getUsername());
 		final String token = jwtTokenUtil.generateToken(user);
 		return new ApiResponse<>(200, "success", new AuthToken(token, user.getUsername()));
+	}*/
+	
+	@RequestMapping(value = "/generate-token", method = RequestMethod.POST)
+	public ApiResponse<AuthToken> register(@RequestBody LoginUser loginUser,HttpServletRequest request) throws AuthenticationException {
+		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginUser.getUsername(), loginUser.getPassword()));
+		final User user = userService.findOne(loginUser.getUsername());
+		 String token = jwtTokenUtil.generateToken(loginUser.getUsername(),request);
+		 System.out.println("Username " +loginUser.getUsername() );
+		 return new ApiResponse<>(200, "success", new AuthToken(token, user.getUsername()));
 	}
 
 }
